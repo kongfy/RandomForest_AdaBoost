@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package auxiliary;
-
 
 /**
  *
- * @author daq
+ * @author 孔繁宇  MF1333020
  */
 public class AdaBoost extends Classifier {
 
