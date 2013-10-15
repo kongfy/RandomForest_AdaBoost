@@ -2,16 +2,23 @@ package auxiliary;
 
 import java.util.*;
 
-
 /**
  *
  * @author 孔繁宇  MF1333020
  */
+
 public class AdaBoost extends Classifier {
     // 存储可放回抽取生成的新样本集
     class RepickSamples {
         double[][] features;
         double[] labels;
+        int[] index;
+    }
+    
+    // 学习结果
+    class LearningResult {
+        double error; // 训练错误率
+        boolean correct[];
     }
     
 	private static int classifier = 3; // 生成分类器的数量
@@ -24,11 +31,117 @@ public class AdaBoost extends Classifier {
 
     @Override
     public void train(boolean[] isCategory, double[][] features, double[] labels) {
+        classifiers = new Classifier[classifier];
+        weightsOfClassifiers = new double[classifier];
+        
+        int samplesCount = labels.length;
+        weightsOfSamples = new double[samplesCount];
+        
+        for (int i = 0; i < samplesCount; ++i) {
+            weightsOfSamples[i] = (double)1 / samplesCount;
+        }
+        
+        for (int i = 0; i < classifier; ++i) {
+            LearningResult result = null;
+            RepickSamples samples = null;
+            do {
+                samples = repickSamplesWithWeights(features, labels);
+                classifiers[i] = new DecisionTree();
+                classifiers[i].train(isCategory, samples.features, samples.labels);
+                
+                result = validateLearningPerformance(classifiers[i], samples);
+            } while (result.error > 0.5);
+            
+            // 调整样本权重
+            weightsOfClassifiers[i] = 0.5 * Math.log((1 - result.error) / result.error);
+            for (int j = 0; j < result.correct.length; ++j) {
+                if (result.correct[j]) {
+                    weightsOfSamples[samples.index[j]] *= Math.exp(-weightsOfClassifiers[i]);
+                } else {
+                    weightsOfSamples[samples.index[j]] *= Math.exp(weightsOfClassifiers[i]);
+                }
+            }
+            
+            // 规范化
+            double total = 0;
+            for (int j = 0; j < samplesCount; ++j) {
+                total += weightsOfSamples[j];
+            }
+            for (int j = 0; j < samplesCount; ++j) {
+                weightsOfSamples[j] /= total;
+            }
+        }
+    }
+    
+    private RepickSamples repickSamplesWithWeights(double[][] features, double[] labels) {
+        RepickSamples samples = new RepickSamples();
+        int size = labels.length;
+        samples.features = new double[size][];
+        samples.index = new int[size];
+        samples.labels = new double[size];
+        
+        Random random = new Random();
+        for (int i = 0; i < size; ++i) {
+            double weight = random.nextDouble();
+            double temp = 0;
+            int j;
+            for (j = 0; j < size; ++j) {
+                temp += weightsOfSamples[j];
+                if (temp > weight) break;
+            }
+            if (j == size) j--;
+            
+            samples.features[i] = features[j].clone();
+            samples.labels[i] = labels[j];
+            samples.index[i] = j;
+        }
+        
+        return samples;
+    }
+    
+    private LearningResult validateLearningPerformance(Classifier classifier, RepickSamples samples) {
+        LearningResult result = new LearningResult();
+        result.error = 0;
+        result.correct = new boolean[samples.labels.length];
+        
+        for (int i = 0; i < samples.labels.length; ++i) {
+            if (samples.labels[i] == classifier.predict(samples.features[i])) {
+                // 预测正确
+                result.correct[i] = true;
+            } else {
+                result.correct[i] = false;
+                result.error += weightsOfSamples[samples.index[i]];
+            }
+        }
+        return result;
     }
 
     @Override
     public double predict(double[] features) {
-        return 0;
+        HashMap<Double, Double> counter = new HashMap<Double, Double>();
+        for (int i = 0; i < classifiers.length; ++i) {
+            double label = classifiers[i].predict(features);
+            if (counter.get(label) == null) {
+                counter.put(label, weightsOfClassifiers[i]);
+            } else {
+                double weight = counter.get(label) + weightsOfClassifiers[i];
+                counter.put(label, weight);
+            }
+        }
+
+        double temp_max = 0;
+        double label = 0;
+        Iterator<Double> iterator = counter.keySet().iterator();
+        while (iterator.hasNext()) {
+            double key = iterator.next();
+            double weight = counter.get(key);
+            if (weight > temp_max) {
+                temp_max = weight;
+                label = key;
+            }
+        }
+
+        return label;
     }
 }
 
