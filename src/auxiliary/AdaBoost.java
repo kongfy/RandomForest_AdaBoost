@@ -21,11 +21,11 @@ public class AdaBoost extends Classifier {
         boolean correct[];
     }
     
-	private static int classifier = 3; // 生成分类器的数量
-	private Classifier classifiers[];
-	private double weightsOfClassifiers[];
-	private double weightsOfSamples[];
-	
+    private static int classifier = 3; // 生成分类器的数量
+    private Classifier classifiers[];
+    private double weightsOfClassifiers[];
+    private double weightsOfSamples[];
+    
     public AdaBoost() {
     }
 
@@ -145,7 +145,7 @@ public class AdaBoost extends Classifier {
     }
 }
 
-//<<<<---------------------------华丽的分界线，下面是决策树的实现----------------------------->>>>
+// <<<<---------------------------华丽的分界线，下面是决策树的实现----------------------------->>>>
 
 class DecisionTree extends Classifier {
     // 决策树节点结构

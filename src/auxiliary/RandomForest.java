@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * 
- * @author 孔繁宇 MF1333020
+ * @author 孔繁宇  MF1333020
  */
 
 public class RandomForest extends Classifier {
