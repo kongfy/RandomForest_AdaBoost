@@ -347,8 +347,13 @@ class RandomDecisionTree extends Classifier {
         int n = (int) Math.log(1 + node.attr_index.length);
         int attrs[] = new int[n];
         Random random = new Random();
+        HashSet<Integer> hash = new HashSet<Integer>();
         for (int i = 0; i < n; ++i) {
-            int index = random.nextInt(node.attr_index.length);
+            int index = 0;
+            do {
+                index = random.nextInt(node.attr_index.length); 
+            } while (hash.contains(index));
+            hash.add(index);
             attrs[i] = node.attr_index[index];
         }
         if (_isClassification) {
