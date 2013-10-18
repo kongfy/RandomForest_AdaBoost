@@ -14,7 +14,7 @@ public class RandomForest extends Classifier {
         double[] labels;
     }
     
-    private static int classifier = 3; // 生成分类器的数量
+    private static int classifier = 5; // 生成分类器的数量
     private RandomDecisionTree forest[];
 
     public RandomForest() {
@@ -55,8 +55,8 @@ public class RandomForest extends Classifier {
             if (counter.get(label) == null) {
                 counter.put(label, 1);
             } else {
-                int count = counter.get(label);
-                counter.put(label, count++);
+                int count = counter.get(label) + 1;
+                counter.put(label, count);
             }
         }
 
