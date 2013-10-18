@@ -54,7 +54,12 @@ public class AdaBoost extends Classifier {
             
             // 调整样本权重
             weightsOfClassifiers[i] = 0.5 * Math.log((1 - result.error) / result.error);
+            HashSet<Integer> checker = new HashSet<Integer>();
             for (int j = 0; j < result.correct.length; ++j) {
+                //同一样本不重复更新权值
+                if (checker.contains(samples.index[j])) continue;
+                checker.add(samples.index[j]);
+                
                 if (result.correct[j]) {
                     weightsOfSamples[samples.index[j]] *= Math.exp(-weightsOfClassifiers[i]);
                 } else {
@@ -104,12 +109,15 @@ public class AdaBoost extends Classifier {
         result.error = 0;
         result.correct = new boolean[samples.labels.length];
         
+        HashSet<Integer> checker = new HashSet<Integer>();
         for (int i = 0; i < samples.labels.length; ++i) {
             if (samples.labels[i] == classifier.predict(samples.features[i])) {
                 // 预测正确
                 result.correct[i] = true;
             } else {
                 result.correct[i] = false;
+                if (checker.contains(samples.index[i])) continue;
+                checker.add(samples.index[i]);
                 result.error += weightsOfSamples[samples.index[i]];
             }
         }
