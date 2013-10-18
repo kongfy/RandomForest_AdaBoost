@@ -12,6 +12,7 @@ public class RandomForest extends Classifier {
     class RepickSamples {
         double[][] features;
         double[] labels;
+        int[] index;
     }
     
     private static int classifier = 5; // 生成分类器的数量
@@ -38,10 +39,12 @@ public class RandomForest extends Classifier {
 
         samples.features = new double[size][];
         samples.labels = new double[size];
+        samples.index = new int[size];
         for (int i = 0; i < size; ++i) {
             int index = random.nextInt(size);
             samples.features[i] = features[index].clone();
             samples.labels[i] = labels[index];
+            samples.index[i] = index;
         }
 
         return samples;
@@ -344,7 +347,7 @@ class RandomDecisionTree extends Classifier {
         if (node.set.length < 7) return result;
 
         // 生成随机选取的属性
-        int n = (int) Math.log(1 + node.attr_index.length);
+        int n = (int) (Math.log(1 + node.attr_index.length) / Math.log(2));
         int attrs[] = new int[n];
         Random random = new Random();
         HashSet<Integer> hash = new HashSet<Integer>();
