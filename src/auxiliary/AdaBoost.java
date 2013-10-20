@@ -21,7 +21,7 @@ public class AdaBoost extends Classifier {
         boolean correct[];
     }
     
-    private static int classifier = 3; // 生成分类器的数量
+    private static int classifier = 9; // 生成分类器的数量
     private Classifier classifiers[];
     private double weightsOfClassifiers[];
     private double weightsOfSamples[];

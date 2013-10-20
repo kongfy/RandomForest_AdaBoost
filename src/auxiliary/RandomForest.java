@@ -15,7 +15,7 @@ public class RandomForest extends Classifier {
         int[] index;
     }
     
-    private static int classifier = 5; // 生成分类器的数量
+    private static int classifier = 9; // 生成分类器的数量
     private RandomDecisionTree forest[];
 
     public RandomForest() {
